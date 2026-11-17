@@ -24,3 +24,18 @@ python -m backend.rag.cli --validate-embeddings
 ```
 
 Retrieval caching applies to passages, never final legal answers. Corpus filenames, modification times, and sizes affect the cache key. An embedding model/vector service and retrieval relevance are not validated. Latest evaluation retrieval precision/recall are 0.0, so retrieval quality needs improvement before broader use.
+
+```mermaid
+flowchart LR
+  OFFICIAL[Official legal documents] --> EXTRACT[PDF extraction]
+  EXTRACT --> CLEAN[Cleaning and metadata validation]
+  CLEAN --> CHUNK[Section-aware deterministic chunking]
+  CHUNK --> LEX[Lexical search index]
+  CHUNK -. optional, not configured .-> EMB[Local embeddings]
+  EMB -. optional .-> CHROMA[(Chroma, not verified)]
+  LEX --> RETRIEVE[Query retrieval]
+  CHROMA -. optional .-> RETRIEVE
+  RETRIEVE --> VERIFY[Independent source and citation verification]
+  VERIFY -->|Sufficient verified evidence| ANSWER[Cited response]
+  VERIFY -->|Missing, invalid, or conflicting| REVIEW[Legal counsel review]
+```

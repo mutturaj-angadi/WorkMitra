@@ -51,6 +51,43 @@ flowchart LR
 ```
 
 The full current-state description is in [architecture](docs/architecture.md) and [RAG pipeline](docs/rag-pipeline.md).
+## Proposed solution and multi-agent workflow
+
+WorkMitra connects a synthetic request to a multi-step research and verification workflow. Classification and fact checks run first. Research searches local sources; an independent verifier checks source authority, exact passage, legal status, dates, and citation provenance. Research and verification are LangGraph nodes/classes in one process, not separately deployed services. The router returns `ANSWER_WITH_CITATION`, `REQUEST_MORE_ESTABLISHMENT_DETAIL`, or `LEGAL_COUNSEL_REVIEW`. Gemini can suggest a bounded search phrase only; it does not decide legal outcomes.
+
+```mermaid
+flowchart TD
+  REQ[Validated synthetic request] --> CLASS[Classification]
+  CLASS --> FACTS{Required facts missing?}
+  FACTS -->|Yes| MORE[REQUEST_MORE_ESTABLISHMENT_DETAIL]
+  FACTS -->|No| SENSITIVE{Sensitive complaint or dispute?}
+  SENSITIVE -->|Yes| COUNSEL[LEGAL_COUNSEL_REVIEW]
+  SENSITIVE -->|No| RESEARCH[Research agent]
+  RESEARCH --> VERIFY[Independent evidence verifier]
+  VERIFY -->|Verified primary evidence| ANSWER[ANSWER_WITH_CITATION]
+  VERIFY -->|Insufficient evidence| RETRY[One bounded retry]
+  RETRY --> VERIFY
+  RETRY -->|Still insufficient| COUNSEL
+```
+
+## RAG pipeline
+
+```mermaid
+flowchart LR
+  SOURCE[Official source PDFs] --> EXTRACT[PDF extraction and validation]
+  EXTRACT --> CLEAN[Text cleaning and metadata]
+  CLEAN --> CHUNK[Deterministic section chunking]
+  CHUNK --> LEX[Local lexical index]
+  CHUNK -. optional, not configured .-> EMB[Embeddings]
+  EMB -. optional .-> CHROMA[(Chroma, not verified)]
+  LEX --> RETRIEVE[Evidence retrieval]
+  CHROMA -. optional .-> RETRIEVE
+  RETRIEVE --> VERIFY[Source, status, date, and citation verification]
+  VERIFY -->|Verified| CITED[Cited response]
+  VERIFY -->|Missing or conflicting evidence| ESCALATE[Counsel review]
+```
+
+The available corpus is incomplete and retrieval evaluation is weak. Optional vector components shown above are not claimed as deployed or operational.
 
 ## Technology
 
@@ -132,3 +169,7 @@ This is a local demonstration prototype. It has no user authentication or author
 - [Local runbook](docs/runbook.md) · [Testing guide](docs/testing-guide.md) · [Troubleshooting](docs/troubleshooting.md)
 - [Final acceptance report](docs/FINAL_ACCEPTANCE_REPORT.md) · [Completion plan](docs/FINAL_COMPLETION_PLAN.md) · [Development progress](DEVELOPMENT_PROGRESS.md)
 - [Demo script](docs/FINAL_DEMO_SCRIPT.md) · [Viva preparation](docs/viva-preparation.md) · [Screenshots](docs/screenshots.md)
+
+## Future scope
+
+Priority follow-up includes obtaining and locally verifying the missing primary Acts, improving retrieval quality, resolving Gemini connectivity, validating the workflow against authoritative sources, and adding authentication, privacy controls, and deployment hardening before broader use.

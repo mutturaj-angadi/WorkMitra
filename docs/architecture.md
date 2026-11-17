@@ -13,7 +13,7 @@ flowchart LR
   RESEARCH --> RAG[Lexical retrieval]
   RAG --> CORPUS[Manifest-verified local PDFs]
   RAG -. optional .-> CHROMA[(Chroma and local embedding model)]
-  GRAPH --> VERIFY[Independent citation and evidence verifier]
+  GRAPH --> VERIFY[Independent citation and evidence verifier]`n  GRAPH -. optional query planning only .-> GEMINI[Gemini provider]`n  API -. deployment option .-> RC[Redis and Celery]`n  PROM -. optional, not verified .-> GRAFANA[Grafana]`n  API -. optional, not verified .-> OTEL[OpenTelemetry exporter]`n  OTEL -. optional, not verified .-> JAEGER[Jaeger]
   VERIFY -->|verified evidence| RESULT[Source-supported response]
   VERIFY -->|insufficient/conflicting evidence| ESCALATE[Human/legal review]
   GRAPH -. configured .-> LANGSMITH[LangSmith trace]
@@ -31,3 +31,18 @@ The Compose configuration includes PostgreSQL, Redis/Celery, frontend/API, Chrom
 ## Evidence and current limits
 
 The local source manifest has six entries: three validated PDFs and 58 extracted chunks, with three primary legal PDFs missing (Code on Social Security, POSH Act, and historical Payment of Gratuity Act). The independent verifier fails closed; the fixed-term gratuity scenario routes to counsel while primary statutory evidence is absent. See [legal sources](legal-sources.md), [RAG pipeline](rag-pipeline.md), and [final acceptance report](FINAL_ACCEPTANCE_REPORT.md).
+
+## Outcome routing
+
+```mermaid
+flowchart TD
+  START[Classified request] --> GATE{Required establishment facts present?}
+  GATE -->|No| MORE[REQUEST_MORE_ESTABLISHMENT_DETAIL]
+  GATE -->|Yes| REVIEW{Sensitive case or unsupported law?}
+  REVIEW -->|Yes| COUNSEL[LEGAL_COUNSEL_REVIEW]
+  REVIEW -->|No| EVIDENCE{Exact primary evidence verified?}
+  EVIDENCE -->|Yes| ANSWER[ANSWER_WITH_CITATION]
+  EVIDENCE -->|No or conflicting| COUNSEL
+```
+
+The request layer quarantines unsafe or identifier-like input before workflow execution. SQLite/PostgreSQL records describe local/deployment paths; SQLite is the persistence path verified in the latest local runtime check.

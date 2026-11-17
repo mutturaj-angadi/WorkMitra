@@ -51,3 +51,10 @@ The current `.env` selects Gemini. The provider probe is expected to show the de
 ## Release verification update (2026-11-17)
 
 The release polish pass reran `python -m compileall -q backend`, `python -m pytest -q -p no:cacheprovider` (43 passed; one upstream pending-deprecation warning), Ruff check/format (40 files already formatted), `pip check` (no broken requirements), and `npm.cmd run build` (passed). The corpus CLI again reported 6 manifest entries, 3 ready, 3 missing, 58 chunks, and no failed extractions. A fresh deterministic evaluation produced 29/30 outcome accuracy, 21/28 classification accuracy, 1.0 escalation/clarification correctness, 0.0 retrieval precision/recall, and 22.372/55.96 ms mean/max latency. This is routing/retrieval evaluation, not legal-answer quality.
+
+## GitHub release verification (2026-11-17)
+
+- Published the public repository at `https://github.com/mutturaj-angadi/WorkMitra`, branch `main`; initial release commit `00bd3be0b1df696da163bf1cf26925b2dec15c8f` includes 125 project files and all seven original screenshots. Follow-up commits add CI configuration updates.
+- GitHub Actions frontend production build passed. Backend compilation, Ruff lint, and Ruff formatting passed, but backend pytest failed in GitHub Actions under Python 3.11 and 3.13. The same 43-test suite passes locally on Python 3.13. GitHub denied access to backend job logs because the connection lacks repository-admin log permission, so the exact failing assertion could not be recovered. Hosted CI is **not green** and needs follow-up with an admin-visible job log.
+- `.env`, local database, build output, dependency folders, caches, and runtime artifacts were excluded. A high-confidence staged-text credential scan found no candidate secrets. Seven supplied screenshots were copied unchanged and committed.
+- Release polish added a README gallery and system/workflow/RAG/outcome diagrams. Deployment and retrieval documentation distinguish verified local behavior from optional or unavailable Compose services.
