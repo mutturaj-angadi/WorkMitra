@@ -30,3 +30,9 @@ The Ministry FAQ and official PIB summaries describe the one-year continuous-ser
 ## Case disposition
 
 The current local corpus can show that section 53 commenced on 2025-11-21 and that the Ministry says fixed-term gratuity eligibility begins after one year. It cannot yet cite the Code's own section 53(1) second proviso. Therefore the 18-month case remains `LEGAL_COUNSEL_REVIEW` with zero verified statutory citations. Do not change that result until the exact primary Act passage, commencement passage and relevant case facts have been ingested and tested together.
+
+## Test-only Gazette excerpt
+
+The deterministic backend suite uses a separate test-only JSONL fixture for S.O. 5319(E), stored at `backend/tests/fixtures/legal/so-5319-e-2025.jsonl`. Its two exact passage chunks were extracted from page 2 of the checked-in Gazette PDF. The PDF SHA-256 was checked against the production source manifest (`4f0bf613ac77aef8d238c2c28d6865e36057fcb1cb8dd28cbd90ff5f054ee508`), and passage checksums were computed over the exact UTF-8 text. Metadata includes the Gazette source URL, 2025-11-21 publication/effective dates, active status, page number, source version, document ID, and chunk identifiers. Fixture provenance and the current official-URL timeout are recorded in `backend/tests/fixtures/README.md`.
+
+This fixture is not copied into `corpus/`, does not replace missing Code on Social Security section 53 text, and is not evidence that production retrieval has been fixed. Production ingestion continues to use the source manifest and available PDF corpus.

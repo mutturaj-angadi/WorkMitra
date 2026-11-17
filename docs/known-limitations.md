@@ -27,3 +27,7 @@
 ## Reproduction
 
 See [`FINAL_ACCEPTANCE_REPORT.md`](FINAL_ACCEPTANCE_REPORT.md) for exact results and [`FINAL_COMPLETION_PLAN.md`](FINAL_COMPLETION_PLAN.md) for ordered follow-up work.
+
+## Test corpus boundary
+
+Backend unit tests now use `backend/tests/fixtures/` and temporary test directories, not the developer's `corpus/` directory. `corpus/ingested/*.jsonl` is generated and ignored; this explains the prior hosted CI failures when several tests searched the local production corpus. The committed test-only Gazette excerpt has a provenance record and validates a narrow commencement-routing case only. It does not add missing primary statutes or change production corpus readiness or gratuity escalation.

@@ -8,22 +8,30 @@ from backend.rag.metadata import validate_metadata
 from backend.rag.retriever import CorpusRetriever
 
 
-def test_empty_corpus_fails_closed():
+def test_empty_corpus_fails_closed(empty_test_corpus):
     result = run_advisory(
         "Is gratuity payable after a fixed-term contract?",
         {},
-        research=ResearchAgent(CorpusRetriever("backend/tests/fixtures/empty")),
+        research=ResearchAgent(CorpusRetriever(empty_test_corpus)),
     )
     assert result["decision"] == "LEGAL_COUNSEL_REVIEW"
     assert result["verification"]["status"] == "INSUFFICIENT_EVIDENCE"
     assert result["retry_count"] == 1
 
 
-def test_official_faq_alone_does_not_verify_statute():
+def test_gazette_commencement_notice_alone_does_not_verify_gratuity(
+    gazette_test_corpus,
+):
     result = run_advisory(
         "Fixed term gratuity after 18 months?",
-        {},
-        research=ResearchAgent(CorpusRetriever("corpus")),
+        {
+            "contract_type": "direct fixed-term",
+            "contract_written": True,
+            "contract_duration_months": 18,
+            "employment_start": "2025-11-22",
+            "employment_end": "2027-05-21",
+        },
+        research=ResearchAgent(CorpusRetriever(gazette_test_corpus)),
     )
     assert result["decision"] == "LEGAL_COUNSEL_REVIEW"
     assert result["verification"]["status"] == "INSUFFICIENT_EVIDENCE"
@@ -68,11 +76,11 @@ def test_metadata_rejects_missing_fields():
         raise AssertionError("expected metadata error")
 
 
-def test_langgraph_traces_gates_tools_and_retry():
+def test_langgraph_traces_gates_tools_and_retry(empty_test_corpus):
     result = run_advisory(
         "Is gratuity payable after a fixed-term contract of 18 months?",
         {},
-        research=ResearchAgent(CorpusRetriever("backend/tests/fixtures/empty")),
+        research=ResearchAgent(CorpusRetriever(empty_test_corpus)),
     )
     assert [event["node"] for event in result["trace"]] == [
         "classify",
@@ -91,29 +99,24 @@ def test_langgraph_traces_gates_tools_and_retry():
     )
 
 
-def test_verifier_applies_relevant_date_and_citation_ids():
-    passage = {
-        "text": "Section 53 exact official words",
-        "metadata": {
-            "chunk_id": "css-53-a",
-            "document_id": "css",
-            "statute_name": "Code on Social Security, 2020",
-            "section": "53",
-            "subsection": "1",
-            "clause": "second proviso",
-            "provision_type": "SECTION",
-            "legal_status": "ACTIVE",
-            "effective_from": "2025-11-21",
-            "effective_to": None,
-            "source_url": "https://www.indiacode.nic.in/example.pdf",
-            "source_version": "Act 36 of 2020 text as on 2025-11-21",
-            "page_number": 42,
-        },
-    }
-    verifier = VerificationAgent()
-    assert not verifier.verify([passage], relevant_date=date(2025, 11, 20))["verified"]
-    current = verifier.verify([passage], relevant_date=date(2025, 11, 22))
-    assert (
-        current["verified"]
-        and current["citations"][0]["chunk_id"] == passage["metadata"]["chunk_id"]
+def test_verifier_applies_relevant_date_and_returns_fixture_citation(
+    gazette_test_corpus,
+):
+    passages = CorpusRetriever(gazette_test_corpus).search_corpus(
+        "section 53 sections 17 to 141 21st November 2025 commencement",
+        document_ids=("so-5319-e-2025",),
     )
+    verifier = VerificationAgent()
+    assert not verifier.verify(
+        passages,
+        relevant_date=date(2025, 11, 20),
+        question="When did Section 53 come into force?",
+    )["verified"]
+    current = verifier.verify(
+        passages,
+        relevant_date=date(2025, 11, 21),
+        question="When did Section 53 come into force?",
+    )
+    assert current["verified"] and current["citations"][0]["chunk_id"] in {
+        passage["metadata"]["chunk_id"] for passage in passages
+    }
