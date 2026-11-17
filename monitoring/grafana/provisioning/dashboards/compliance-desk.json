@@ -1,0 +1,21 @@
+{
+  "uid": "compliance-desk-overview",
+  "title": "Workplace Compliance Desk",
+  "tags": ["compliance", "operations"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "15s",
+  "panels": [
+    {"id":1,"type":"timeseries","title":"API requests / second","gridPos":{"h":8,"w":12,"x":0,"y":0},"targets":[{"expr":"sum by (route) (rate(compliance_api_requests_total[5m]))","legendFormat":"{{route}}","refId":"A"}],"datasource":{"type":"prometheus","uid":"prometheus"}},
+    {"id":2,"type":"timeseries","title":"API latency p50 / p95 (seconds)","gridPos":{"h":8,"w":12,"x":12,"y":0},"targets":[{"expr":"histogram_quantile(0.50, sum by (le) (rate(compliance_api_request_seconds_bucket[5m])))","legendFormat":"p50","refId":"A"},{"expr":"histogram_quantile(0.95, sum by (le) (rate(compliance_api_request_seconds_bucket[5m])))","legendFormat":"p95","refId":"B"}],"datasource":{"type":"prometheus","uid":"prometheus"}},
+    {"id":3,"type":"timeseries","title":"API error rate","gridPos":{"h":8,"w":8,"x":0,"y":8},"targets":[{"expr":"sum(rate(compliance_api_requests_total{status=~\"5..\"}[5m])) / clamp_min(sum(rate(compliance_api_requests_total[5m])), 1)","legendFormat":"5xx fraction","refId":"A"}],"datasource":{"type":"prometheus","uid":"prometheus"}},
+    {"id":4,"type":"timeseries","title":"Persisted runs by decision","gridPos":{"h":8,"w":8,"x":8,"y":8},"targets":[{"expr":"compliance_runs_by_decision","legendFormat":"{{decision}}","refId":"A"}],"datasource":{"type":"prometheus","uid":"prometheus"}},
+    {"id":5,"type":"timeseries","title":"Workflow node latency p50 / p95 (ms)","gridPos":{"h":8,"w":8,"x":16,"y":8},"targets":[{"expr":"compliance_agent_event_duration_ms{quantile=\"0.5\"}","legendFormat":"{{agent}} / {{event}} p50","refId":"A"},{"expr":"compliance_agent_event_duration_ms{quantile=\"0.95\"}","legendFormat":"{{agent}} / {{event}} p95","refId":"B"}],"datasource":{"type":"prometheus","uid":"prometheus"}},
+    {"id":6,"type":"timeseries","title":"Retrieval cache hit / miss","gridPos":{"h":8,"w":12,"x":0,"y":16},"targets":[{"expr":"sum by (result) (rate(compliance_retrieval_cache_total[5m]))","legendFormat":"{{result}}","refId":"A"}],"datasource":{"type":"prometheus","uid":"prometheus"}},
+    {"id":7,"type":"timeseries","title":"API availability","gridPos":{"h":8,"w":12,"x":12,"y":16},"targets":[{"expr":"up{job=\"compliance-api\"}","legendFormat":"{{job}}","refId":"A"}],"datasource":{"type":"prometheus","uid":"prometheus"}},
+    {"id":8,"type":"timeseries","title":"Feedback ratings and average","gridPos":{"h":8,"w":12,"x":0,"y":24},"targets":[{"expr":"compliance_feedback_ratings_total","legendFormat":"rating {{rating}}","refId":"A"},{"expr":"compliance_feedback_average_rating","legendFormat":"average","refId":"B"}],"datasource":{"type":"prometheus","uid":"prometheus"}}
+  ],
+  "annotations": {"list": []},
+  "links": []
+}

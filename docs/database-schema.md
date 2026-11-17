@@ -1,0 +1,3 @@
+# Database schema
+
+Current SQLAlchemy models: `compliance_requests`, `compliance_runs`, `agent_executions`, `quarantined_requests`, `feedback`, and `corpus_versions`. PostgreSQL is configured for Compose and SQLite is local default. Request facts and final evidence/results are JSON columns; each workflow node, tool call, verifier outcome and correlation/prompt version is stored in `agent_executions`. Feedback counts and run/decision/event gauges are aggregated from this database at metrics scrape time. Tables currently use SQLAlchemy `create_all`; Alembic revisions, migration tests and broader user/audit/evaluation tables are not implemented. The SQLite development database is a workspace artifact and must not be treated as migration proof.

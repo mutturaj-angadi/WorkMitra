@@ -1,0 +1,8 @@
+.env
+.git
+.pytest_cache
+__pycache__
+*.py[cod]
+workplace_compliance.db
+frontend/node_modules
+frontend/dist
