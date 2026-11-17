@@ -1,6 +1,6 @@
 # Final Runtime Acceptance Report
 
-**Verification date:** 2026-11-16 (Asia/Calcutta)
+**Verification date:** 2026-11-17 (Asia/Calcutta; CI rerun)
 **Disposition:** Local runtime verified; live Gemini response and complete legal-source coverage remain blocked.
 
 ## Executive summary
@@ -114,6 +114,12 @@ Docker was unavailable: the Docker engine named pipe was absent and the Docker c
 7. Generated-answer quality and prompt comparison are not measured because answer generation is not used for legal conclusions.
 
 ## Reproduction commands
+
+## GitHub Actions CI verification (2026-11-17)
+
+The corpus-dependent failures were caused by tests reading ignored generated ingestion output. Tests now use committed, provenance-documented fixtures and temporary corpus roots. A first follow-up run exposed a dependency lock generated on Windows that could not install on GitHub's Linux runner; CI now uses the universal `uv.lock` with uv 0.13.8. Run [44041844414](https://github.com/mutturaj-angadi/WorkMitra/actions/runs/44041844414), commit `8352ce68a490393ece0ff004906a5a509d9f4569`, completed successfully for both jobs. Backend dependency sync, compile, Ruff lint/format, and pytest passed; frontend `npm ci` and production build passed. Local pytest result was 47 passed with one upstream deprecation warning. This test result covers deterministic routing/retrieval regressions, not production corpus completeness or legal answer quality.
+
+The CI pytest console output was not needed to diagnose this pass; the successful job step is visible in the run. See [`testing-guide.md`](testing-guide.md) for reproducible local commands and lock maintenance.
 
 In PowerShell at the repository root:
 

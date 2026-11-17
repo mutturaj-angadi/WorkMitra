@@ -1,6 +1,6 @@
 # Known Limitations
 
-**Updated:** 2026-11-16
+**Updated:** 2026-11-17
 
 ## Legal corpus and answer coverage
 
@@ -31,3 +31,5 @@ See [`FINAL_ACCEPTANCE_REPORT.md`](FINAL_ACCEPTANCE_REPORT.md) for exact results
 ## Test corpus boundary
 
 Backend unit tests now use `backend/tests/fixtures/` and temporary test directories, not the developer's `corpus/` directory. `corpus/ingested/*.jsonl` is generated and ignored; this explains the prior hosted CI failures when several tests searched the local production corpus. The committed test-only Gazette excerpt has a provenance record and validates a narrow commencement-routing case only. It does not add missing primary statutes or change production corpus readiness or gratuity escalation.
+
+The corpus-isolation regressions pass locally (47 tests) and in GitHub Actions run [44041844414](https://github.com/mutturaj-angadi/WorkMitra/actions/runs/44041844414). The CI dependency set is locked with `uv.lock`; it is separate from the production legal-source limitations above.

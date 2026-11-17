@@ -1,6 +1,6 @@
 # Final Completion Plan and Verification Status
 
-**Updated:** 2026-11-16
+**Updated:** 2026-11-17
 **Workspace:** `C:\SEM 5\MLOPs-Mini Project`
 
 This plan records the latest runtime verification. Older reports describing a live Docker Compose stack or 20-case evaluation are superseded by the current evidence in [`FINAL_ACCEPTANCE_REPORT.md`](FINAL_ACCEPTANCE_REPORT.md).
@@ -38,13 +38,15 @@ flowchart LR
 | Fixed-term gratuity | 18-month case escalated with 0 verified citations | Correct safe behavior; required answer scenario blocked |
 | Corpus | 3 of 6 sources, 58 chunks; missing primary law documents; checksums match for local PDFs | Partial / blocked |
 | Vector retrieval | No embedding model; CLI reports unavailable | Not configured |
-| Backend tests | 43 passed, one upstream deprecation warning | Pass |
+| Backend tests / hosted CI | Local deterministic suite 47 passed with one upstream warning; GitHub run 44041844414 passed dependency sync, compile, Ruff lint/format, and pytest | Pass |
 | Ruff / compile / dependency consistency | Lint, format, compile, pip check passed | Pass |
 | Frontend production build | `npm.cmd run build` passed | Pass |
 | Deterministic evaluation | 30 scenarios; outcome 29/30, classification 21/28; answer-quality denominator 0 | Partial; no generated answer quality claim |
 | Local load profile | 20 users / 30 seconds / stub + SQLite; 1,321 HTTP requests and zero reported request failures | Pass for local stub profile only |
 | Docker services | Docker named pipe absent; daemon/config unavailable | Not tested |
 | Visual browser QA | Browser access host unavailable; HTTP delivery/proxy checked | Not tested visually |
+
+CI regression details and the final green run are recorded in [`DEVELOPMENT_PROGRESS.md`](../DEVELOPMENT_PROGRESS.md) and [`FINAL_ACCEPTANCE_REPORT.md`](FINAL_ACCEPTANCE_REPORT.md). The committed Gazette fixture remains test-only and does not expand the production law corpus.
 
 ## Highest-priority follow-up
 
