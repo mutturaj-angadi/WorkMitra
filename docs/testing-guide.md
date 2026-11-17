@@ -32,7 +32,7 @@ npm.cmd run build
 Pop-Location
 ```
 
-`npm ci` installs the exact frontend dependency lock. Backend CI uses the explicit project-supported Python 3.13 runtime and installs `requirements-ci.lock` with hash checking. Regenerate that lock intentionally from `requirements-dev.txt` using `pip-compile --generate-hashes --allow-unsafe --output-file requirements-ci.lock requirements-dev.txt`, review the diff, and verify the workflow before updating it.
+`npm ci` installs the exact frontend dependency lock. Backend CI uses the explicit project-supported Python 3.13 runtime and the cross-platform `uv.lock`; `uv sync --locked --no-install-project --group dev` refuses an out-of-date lock. Regenerate intentionally with the pinned uv version (`uv lock --python 3.13`), review the diff, and verify the workflow before updating it.
 
 ## Corpus and deterministic evaluation
 
